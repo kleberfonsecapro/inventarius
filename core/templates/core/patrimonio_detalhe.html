@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ patrimonio.numero_patrimonio }} — Inventarius{% endblock %}
+{% block page_title %}{{ patrimonio.nome }}{% endblock %}
+{% block page_subtitle %}Nº {{ patrimonio.numero_patrimonio }}{% endblock %}
+
+{% block header_actions %}
+  <a href="{% url 'core:patrimonio_editar' patrimonio.pk %}"
+    class="flex items-center gap-2 bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
+    Editar
+  </a>
+  <a href="{% url 'core:plaqueta' patrimonio.pk %}" target="_blank"
+    class="flex items-center gap-2 bg-brand text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+    🖨️ Imprimir Plaqueta
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- Info principal -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Dados do Item</h2>
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Número de Patrimônio</p>
+          <p class="font-mono font-bold text-brand text-lg">{{ patrimonio.numero_patrimonio }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Cadastrado em</p>
+          <p class="text-slate-700 text-sm">{{ patrimonio.criado_em|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="col-span-2">
+          <p class="text-xs text-slate-400 mb-1">Nome do Item</p>
+          <p class="text-slate-800 font-semibold">{{ patrimonio.nome }}</p>
+        </div>
+        {% if patrimonio.descricao %}
+        <div class="col-span-2">
+          <p class="text-xs text-slate-400 mb-1">Descrição</p>
+          <p class="text-slate-600 text-sm">{{ patrimonio.descricao }}</p>
+        </div>
+        {% endif %}
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Setor Atual</p>
+          <p class="text-slate-800">{{ patrimonio.setor|default:"Não definido" }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Servidor Responsável</p>
+          <p class="text-slate-800">{{ patrimonio.servidor_responsavel|default:"Não definido" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% if patrimonio.foto %}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Foto</h2>
+      <img src="{{ patrimonio.foto.url }}" alt="{{ patrimonio.nome }}"
+        class="rounded-xl max-h-64 object-contain w-full bg-slate-50" />
+    </div>
+    {% endif %}
+
+    <!-- Histórico -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-800">Histórico de Auditoria</h2>
+      </div>
+      {% if historico %}
+      <div class="divide-y divide-slate-50">
+        {% for reg in historico %}
+        <div class="px-6 py-3 flex items-start gap-4">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5
+            {% if reg.tipo == 'confirmacao' %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+            {% if reg.tipo == 'confirmacao' %}✓{% else %}→{% endif %}
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-800">{{ reg.get_tipo_display }}</p>
+            {% if reg.tipo == 'transferencia' %}
+            <p class="text-xs text-slate-500">{{ reg.setor_origem|default:"?" }} → {{ reg.setor_destino|default:"?" }}</p>
+            {% else %}
+            <p class="text-xs text-slate-500">Local: {{ reg.setor_destino|default:"—" }}</p>
+            {% endif %}
+            {% if reg.observacao %}<p class="text-xs text-slate-400 italic mt-0.5">{{ reg.observacao }}</p>{% endif %}
+          </div>
+          <span class="text-xs text-slate-400 font-mono">{{ reg.registrado_em|date:"d/m H:i" }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="px-6 py-8 text-center text-slate-400 text-sm">Nenhuma auditoria registrada.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- QR Code -->
+  <div class="space-y-4">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">QR Code</h2>
+      {% if patrimonio.qrcode_img %}
+        <img src="{{ patrimonio.qrcode_img.url }}" alt="QR Code" class="w-48 h-48 mx-auto rounded-xl" />
+        <p class="text-xs text-slate-400 mt-3 font-mono">/verificar/{{ patrimonio.numero_patrimonio }}/</p>
+      {% else %}
+        <div class="w-48 h-48 bg-slate-100 rounded-xl mx-auto flex items-center justify-center">
+          <p class="text-slate-400 text-xs">Sem QR Code</p>
+        </div>
+      {% endif %}
+      <a href="{% url 'core:plaqueta' patrimonio.pk %}" target="_blank"
+        class="mt-4 w-full flex items-center justify-center gap-2 bg-brand text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-brand-light transition-colors">
+        🖨️ Imprimir Plaqueta
+      </a>
+      <a href="{% url 'core:verificar_patrimonio' patrimonio.numero_patrimonio %}"
+        class="mt-2 w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-700 text-sm font-medium py-2 rounded-xl hover:bg-slate-200 transition-colors">
+        🔍 Verificar / Auditoria
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

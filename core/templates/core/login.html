@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Inventarius</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { DEFAULT: '#1e3a5f', light: '#2d5282', accent: '#e8a020' } }, fontFamily: { sans: ['Sora', 'sans-serif'] } } }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-input {
+      width: 100%; border: 1px solid #e2e8f0; border-radius: 0.5rem;
+      padding: 0.65rem 0.85rem; font-size: 0.9rem; color: #334155;
+      background: #f8fafc; outline: none; transition: border-color 0.15s; font-family: 'Sora', sans-serif;
+    }
+    .form-input:focus { border-color: #1e3a5f; background: white; }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-sm">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-brand rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-800">Inventarius</h1>
+      <p class="text-slate-500 text-sm mt-1">Gestão de Patrimônio</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-lg font-semibold text-slate-800 mb-6">Entrar no sistema</h2>
+
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5">
+          {% for err in form.non_field_errors %}
+            <p class="text-red-700 text-sm">{{ err }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.username.label }}</label>
+          {{ form.username }}
+          {% for err in form.username.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.password.label }}</label>
+          {{ form.password }}
+          {% for err in form.password.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <button type="submit"
+          class="w-full bg-brand text-white py-3 rounded-xl font-semibold text-sm hover:bg-brand-light transition-colors mt-2">
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% block title %}Usuários — Inventarius{% endblock %}
+{% block page_title %}Usuários do Sistema{% endblock %}
+{% block page_subtitle %}Gerencie quem tem acesso ao Inventarius{% endblock %}
+
+{% block header_actions %}
+  <a href="{% url 'core:usuario_novo' %}"
+    class="flex items-center gap-2 bg-brand text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    Novo Usuário
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+  <div class="px-6 py-3 bg-slate-50 border-b border-slate-200">
+    <p class="text-sm text-slate-600"><span class="font-semibold font-mono text-slate-800">{{ usuarios.count }}</span> usuário{{ usuarios.count|pluralize }}</p>
+  </div>
+  {% if usuarios %}
+  <div class="divide-y divide-slate-50">
+    {% for u in usuarios %}
+    <div class="px-6 py-4 flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0
+        {% if u.is_superuser %}bg-purple-100 text-purple-700
+        {% elif u.is_staff %}bg-blue-100 text-blue-700
+        {% else %}bg-slate-100 text-slate-600{% endif %}">
+        {{ u.first_name|first|upper|default:u.username|first|upper }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <p class="font-semibold text-slate-800 text-sm">
+            {{ u.get_full_name|default:u.username }}
+          </p>
+          {% if u.is_superuser %}
+            <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Superusuário</span>
+          {% elif u.is_staff %}
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin</span>
+          {% else %}
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Operador</span>
+          {% endif %}
+          {% if not u.is_active %}
+            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">Inativo</span>
+          {% endif %}
+        </div>
+        <p class="text-xs text-slate-400 font-mono">@{{ u.username }}{% if u.email %} · {{ u.email }}{% endif %}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        {% if not u.is_superuser %}
+          <a href="{% url 'core:usuario_editar' u.pk %}"
+            class="text-xs font-medium text-brand hover:text-brand-light px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
+            Editar
+          </a>
+          {% if u != request.user %}
+          <a href="{% url 'core:usuario_toggle' u.pk %}"
+            class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors
+            {% if u.is_active %}text-red-600 hover:bg-red-50{% else %}text-green-600 hover:bg-green-50{% endif %}">
+            {% if u.is_active %}Desativar{% else %}Ativar{% endif %}
+          </a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="px-6 py-12 text-center text-slate-400 text-sm">Nenhum usuário encontrado.</div>
+  {% endif %}
+</div>
+{% endblock %}

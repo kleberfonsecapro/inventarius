@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Inventarius{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: { DEFAULT: '#1f7d45', light: '#2d5282', accent: '#e8a020' } },
+          fontFamily: { sans: ['Sora', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-slate-100 font-sans min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="no-print w-64 bg-brand min-h-screen flex flex-col fixed left-0 top-0 z-30 shadow-2xl">
+    <div class="px-6 py-5 border-b border-brand-light">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-brand-accent rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-white font-bold text-base leading-tight">Inventarius</p>
+          <p class="text-blue-200 text-xs">Gestão de Patrimônio</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <a href="{% url 'core:dashboard' %}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-brand-light text-white{% endif %}">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span class="text-sm font-medium">Dashboard</span>
+      </a>
+      <a href="{% url 'core:patrimonio_lista' %}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors {% if 'patrimonio' in request.resolver_match.url_name %}bg-brand-light text-white{% endif %}">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <span class="text-sm font-medium">Patrimônios</span>
+      </a>
+      <a href="{% url 'core:patrimonio_novo' %}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="text-sm font-medium">Novo Patrimônio</span>
+      </a>
+      <a href="{% url 'core:leitor_qrcode' %}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors {% if request.resolver_match.url_name == 'leitor_qrcode' %}bg-brand-light text-white{% endif %}">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+        <span class="text-sm font-medium">Leitor QR Code</span>
+      </a>
+
+      {% if request.user.is_staff %}
+      <div class="pt-3 mt-2 border-t border-brand-light">
+        <p class="text-xs text-blue-300 px-3 mb-2 uppercase tracking-wider font-semibold">Administração</p>
+        <a href="{% url 'core:usuario_lista' %}"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors {% if 'usuario' in request.resolver_match.url_name %}bg-brand-light text-white{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="text-sm font-medium">Usuários</span>
+        </a>
+        <a href="/admin/" target="_blank"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100 hover:bg-brand-light hover:text-white transition-colors">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="text-sm font-medium">Admin Django</span>
+        </a>
+      </div>
+      {% endif %}
+    </nav>
+
+    <!-- Usuário logado -->
+    <div class="px-4 py-4 border-t border-brand-light">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+          {{ request.user.first_name|first|upper|default:request.user.username|first|upper }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-white text-xs font-semibold truncate">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </p>
+          <p class="text-blue-300 text-xs truncate">
+            {% if request.user.is_staff %}Administrador{% else %}Operador{% endif %}
+          </p>
+        </div>
+        <a href="{% url 'core:logout' %}" title="Sair"
+          class="text-blue-300 hover:text-white transition-colors p-1 rounded">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="ml-64 flex-1 flex flex-col min-h-screen">
+    <header
+      class="no-print bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+      <div>
+        <h1 class="text-lg font-semibold text-slate-800">{% block page_title %}Inventarius{% endblock %}</h1>
+        <p class="text-xs text-slate-500">{% block page_subtitle %}Sistema de Gestão de Patrimônio{% endblock %}</p>
+      </div>
+      <div class="flex items-center gap-3">{% block header_actions %}{% endblock %}</div>
+    </header>
+
+    <main class="flex-1 p-8">
+      {% if messages %}
+      {% for message in messages %}
+      <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium
+            {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
+            {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200
+            {% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+</body>
+
+</html>

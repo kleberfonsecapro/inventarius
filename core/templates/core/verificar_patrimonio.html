@@ -1,0 +1,151 @@
+{% extends 'core/base.html' %}
+{% block title %}Verificar {{ patrimonio.numero_patrimonio }} — Inventarius{% endblock %}
+{% block page_title %}Verificação / Auditoria{% endblock %}
+{% block page_subtitle %}{{ patrimonio.numero_patrimonio }} — {{ patrimonio.nome }}{% endblock %}
+
+{% block content %}
+<style>
+  .form-input {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #334155;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: #1e3a5f; background: white; }
+</style>
+
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <!-- Info do item -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-start gap-5">
+    {% if patrimonio.qrcode_img %}
+    <img src="{{ patrimonio.qrcode_img.url }}" class="w-20 h-20 rounded-xl shrink-0 border border-slate-200" alt="QR" />
+    {% endif %}
+    <div class="flex-1">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="font-mono font-bold text-brand text-xl">{{ patrimonio.numero_patrimonio }}</p>
+          <p class="font-semibold text-slate-800 mt-0.5">{{ patrimonio.nome }}</p>
+        </div>
+        <a href="{% url 'core:patrimonio_detalhe' patrimonio.pk %}"
+          class="text-xs text-slate-400 hover:text-brand transition-colors">Ver ficha →</a>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-3">
+        <div class="bg-blue-50 rounded-lg p-3">
+          <p class="text-xs text-slate-500 mb-0.5">Setor cadastrado</p>
+          <p class="text-sm font-semibold text-brand">{{ patrimonio.setor|default:"Não definido" }}</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-xs text-slate-500 mb-0.5">Responsável</p>
+          <p class="text-sm font-semibold text-slate-700">{{ patrimonio.servidor_responsavel|default:"Não definido" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de auditoria -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <h2 class="font-semibold text-slate-800 mb-4">Registrar Ocorrência</h2>
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+
+      <!-- Ação -->
+      <div>
+        <p class="text-sm font-medium text-slate-700 mb-2">O que deseja registrar?</p>
+        <div class="space-y-2">
+          {% for radio in form.acao %}
+          <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-brand transition-colors has-[:checked]:border-brand has-[:checked]:bg-blue-50">
+            {{ radio.tag }}
+            <span class="text-sm font-medium text-slate-700">{{ radio.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% for err in form.acao.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ err }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Setor destino -->
+      <div id="transferencia-fields">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">
+          {{ form.setor_destino.label }}
+        </label>
+        {{ form.setor_destino }}
+        {% for err in form.setor_destino.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ err }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Servidor -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.servidor_responsavel.label }}</label>
+        {{ form.servidor_responsavel }}
+      </div>
+
+      <!-- Observação -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.observacao.label }}</label>
+        {{ form.observacao }}
+      </div>
+
+      <div class="pt-2 flex gap-3">
+        <button type="submit"
+          class="flex-1 bg-brand text-white py-3 rounded-xl font-semibold text-sm hover:bg-brand-light transition-colors">
+          Confirmar Registro
+        </button>
+        <a href="{% url 'core:leitor_qrcode' %}"
+          class="bg-slate-100 text-slate-600 px-5 py-3 rounded-xl text-sm font-medium hover:bg-slate-200 transition-colors">
+          Escanear Outro
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Histórico recente -->
+  {% if historico %}
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-3 border-b border-slate-100">
+      <p class="text-sm font-semibold text-slate-700">Últimas ocorrências</p>
+    </div>
+    <div class="divide-y divide-slate-50">
+      {% for reg in historico %}
+      <div class="px-6 py-3 flex items-center gap-3 text-sm">
+        <span class="{% if reg.tipo == 'confirmacao' %}text-green-600{% else %}text-amber-600{% endif %}">
+          {% if reg.tipo == 'confirmacao' %}✅{% else %}🔀{% endif %}
+        </span>
+        <span class="text-slate-700 flex-1">{{ reg.get_tipo_display }}
+          {% if reg.tipo == 'transferencia' and reg.setor_destino %}→ {{ reg.setor_destino.nome }}{% endif %}
+        </span>
+        <span class="text-xs text-slate-400 font-mono">{{ reg.registrado_em|date:"d/m H:i" }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  // Mostra/oculta campo de setor conforme ação
+  function toggleTransferencia() {
+    const radios = document.querySelectorAll('input[name="acao"]');
+    const field = document.getElementById('transferencia-fields');
+    radios.forEach(r => {
+      if (r.checked && r.value === 'transferencia') {
+        field.style.display = 'block';
+      } else if (r.checked) {
+        field.style.display = 'none';
+      }
+    });
+  }
+  document.querySelectorAll('input[name="acao"]').forEach(r => {
+    r.addEventListener('change', toggleTransferencia);
+  });
+  toggleTransferencia();
+</script>
+{% endblock %}

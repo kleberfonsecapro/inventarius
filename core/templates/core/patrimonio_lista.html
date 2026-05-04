@@ -1,0 +1,120 @@
+{% extends 'core/base.html' %}
+{% block title %}Patrimônios — Inventarius{% endblock %}
+{% block page_title %}Patrimônios{% endblock %}
+{% block page_subtitle %}Pesquisa e listagem de itens{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'core:plaqueta_lote' %}"
+  class="flex items-center gap-2 bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
+  🖨️ Impressão em Lote
+</a>
+<a href="{% url 'core:patrimonio_novo' %}"
+  class="flex items-center gap-2 bg-brand text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+  </svg>
+  Novo
+</a>
+{% endblock %}
+
+{% block content %}
+<style>
+  .form-input {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #334155;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus {
+    border-color: #1e3a5f;
+    background: white;
+  }
+</style>
+
+<!-- Filtros -->
+<form method="get" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 mb-6">
+  <div class="flex flex-col md:flex-row gap-3">
+    <div class="flex-1">
+      {{ form.q }}
+    </div>
+    <div class="w-full md:w-64">
+      {{ form.setor }}
+    </div>
+    <button type="submit"
+      class="bg-brand text-white px-6 py-2 rounded-lg font-medium text-sm hover:bg-brand-light transition-colors">
+      Buscar
+    </button>
+    {% if request.GET.q or request.GET.setor %}
+    <a href="{% url 'core:patrimonio_lista' %}"
+      class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors flex items-center">
+      Limpar
+    </a>
+    {% endif %}
+  </div>
+</form>
+
+<!-- Tabela -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+  <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+    <p class="text-sm text-slate-600">
+      <span class="font-semibold font-mono text-slate-800">{{ patrimonios.count }}</span> resultado{{
+      patrimonios.count|pluralize }}
+    </p>
+  </div>
+  {% if patrimonios %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs text-slate-500 uppercase tracking-wide border-b border-slate-100">
+          <th class="px-6 py-3 font-medium">Nº Patrimônio</th>
+          <th class="px-6 py-3 font-medium">Nome</th>
+          <th class="px-6 py-3 font-medium">Setor</th>
+          <th class="px-6 py-3 font-medium">Responsável</th>
+          <th class="px-6 py-3 font-medium">QR</th>
+          <th class="px-6 py-3 font-medium">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        {% for p in patrimonios %}
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-3 font-mono font-semibold text-brand">{{ p.numero_patrimonio }}</td>
+          <td class="px-6 py-3 text-slate-800">{{ p.nome }}</td>
+          <td class="px-6 py-3 text-slate-600">{{ p.setor|default:"—" }}</td>
+          <td class="px-6 py-3 text-slate-600">{{ p.servidor_responsavel|default:"—" }}</td>
+          <td class="px-6 py-3">
+            {% if p.qrcode_img %}
+            <img src="{{ p.qrcode_img.url }}" class="w-10 h-10 rounded" alt="QR" />
+            {% else %}<span class="text-slate-300">—</span>{% endif %}
+          </td>
+          <td class="px-6 py-3">
+            <div class="flex items-center gap-2">
+              <a href="{% url 'core:patrimonio_detalhe' p.pk %}"
+                class="text-brand hover:text-brand-light text-xs font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors">Ver</a>
+              <a href="{% url 'core:plaqueta' p.pk %}" target="_blank"
+                class="text-slate-500 hover:text-slate-700 text-xs font-medium px-2 py-1 rounded hover:bg-slate-100 transition-colors">Plaqueta</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="px-6 py-16 text-center">
+    <svg class="w-12 h-12 text-slate-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p class="text-slate-400 text-sm">Nenhum patrimônio encontrado.</p>
+    <a href="{% url 'core:patrimonio_novo' %}"
+      class="mt-3 inline-block text-brand text-sm font-medium hover:underline">Cadastrar primeiro patrimônio →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

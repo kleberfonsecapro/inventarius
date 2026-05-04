@@ -1,0 +1,125 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard — Inventarius{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Visão geral do inventário{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'core:patrimonio_novo' %}"
+  class="flex items-center gap-2 bg-brand text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+  </svg>
+  Novo Patrimônio
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex items-center gap-5">
+    <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center">
+      <svg class="w-7 h-7 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-slate-800 font-mono">{{ total_patrimonios }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">Patrimônios cadastrados</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex items-center gap-5">
+    <div class="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center">
+      <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-slate-800 font-mono">{{ total_setores }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">Setores ativos</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex items-center gap-5">
+    <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center">
+      <svg class="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-slate-800 font-mono">{{ total_servidores }}</p>
+      <p class="text-sm text-slate-500 mt-0.5">Servidores ativos</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick actions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <a href="{% url 'core:leitor_qrcode' %}"
+    class="bg-brand rounded-2xl p-6 flex items-center gap-5 hover:bg-brand-light transition-colors shadow-sm group">
+    <div
+      class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
+      <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-white font-bold text-base">Leitor QR Code</p>
+      <p class="text-blue-200 text-sm mt-0.5">Abrir câmera para verificação</p>
+    </div>
+    <svg class="w-5 h-5 text-blue-200 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+  <a href="{% url 'core:patrimonio_lista' %}"
+    class="bg-white rounded-2xl p-6 flex items-center gap-5 hover:shadow-md transition-shadow border border-slate-200 group">
+    <div class="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center">
+      <svg class="w-7 h-7 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-slate-800 font-bold text-base">Pesquisa Avançada</p>
+      <p class="text-slate-500 text-sm mt-0.5">Buscar patrimônios por número, nome ou setor</p>
+    </div>
+    <svg class="w-5 h-5 text-slate-400 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+</div>
+
+<!-- Histórico -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+    <h2 class="font-semibold text-slate-800">Últimas Auditorias</h2>
+    <span class="text-xs text-slate-400">Últimas 10 ocorrências</span>
+  </div>
+  {% if ultimas_auditorias %}
+  <div class="divide-y divide-slate-50">
+    {% for reg in ultimas_auditorias %}
+    <div class="px-6 py-3 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+      <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0
+        {% if reg.tipo == 'confirmacao' %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+        {% if reg.tipo == 'confirmacao' %}✅{% else %}🔀{% endif %}
+      </span>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-slate-800 truncate">{{ reg.patrimonio.nome }}</p>
+        <p class="text-xs text-slate-500">
+          {{ reg.get_tipo_display }}
+          {% if reg.tipo == 'transferencia' and reg.setor_destino %} → {{ reg.setor_destino.nome }}{% endif %}
+        </p>
+      </div>
+      <span class="text-xs text-slate-400 font-mono shrink-0">{{ reg.registrado_em|date:"d/m H:i" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="px-6 py-12 text-center text-slate-400">
+    <p class="text-sm">Nenhuma auditoria registrada ainda.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
