@@ -16,14 +16,21 @@
     outline: none;
     transition: border-color 0.15s;
   }
-  .form-input:focus { border-color: #1e3a5f; background: white; }
+
+  .form-input:focus {
+    border-color: #1e3a5f;
+    background: white;
+  }
 </style>
 
 <div class="max-w-2xl mx-auto space-y-6">
 
   <!-- Info do item -->
   <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-start gap-5">
-    {% if patrimonio.qrcode_img %}
+    {% if patrimonio.foto %}
+    <img src="{{ patrimonio.foto.url }}" class="w-24 h-24 rounded-xl shrink-0 border border-slate-200 object-cover"
+      alt="Foto" />
+    {% elif patrimonio.qrcode_img %}
     <img src="{{ patrimonio.qrcode_img.url }}" class="w-20 h-20 rounded-xl shrink-0 border border-slate-200" alt="QR" />
     {% endif %}
     <div class="flex-1">
@@ -42,7 +49,8 @@
         </div>
         <div class="bg-slate-50 rounded-lg p-3">
           <p class="text-xs text-slate-500 mb-0.5">Responsável</p>
-          <p class="text-sm font-semibold text-slate-700">{{ patrimonio.servidor_responsavel|default:"Não definido" }}</p>
+          <p class="text-sm font-semibold text-slate-700">{{ patrimonio.servidor_responsavel|default:"Não definido" }}
+          </p>
         </div>
       </div>
     </div>
@@ -59,14 +67,15 @@
         <p class="text-sm font-medium text-slate-700 mb-2">O que deseja registrar?</p>
         <div class="space-y-2">
           {% for radio in form.acao %}
-          <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-brand transition-colors has-[:checked]:border-brand has-[:checked]:bg-blue-50">
+          <label
+            class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-brand transition-colors has-[:checked]:border-brand has-[:checked]:bg-blue-50">
             {{ radio.tag }}
             <span class="text-sm font-medium text-slate-700">{{ radio.choice_label }}</span>
           </label>
           {% endfor %}
         </div>
         {% for err in form.acao.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ err }}</p>
+        <p class="text-red-500 text-xs mt-1">{{ err }}</p>
         {% endfor %}
       </div>
 
@@ -77,7 +86,7 @@
         </label>
         {{ form.setor_destino }}
         {% for err in form.setor_destino.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ err }}</p>
+        <p class="text-red-500 text-xs mt-1">{{ err }}</p>
         {% endfor %}
       </div>
 

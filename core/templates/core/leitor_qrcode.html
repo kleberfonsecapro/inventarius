@@ -9,11 +9,10 @@
 
 {% block content %}
 <div class="max-w-lg mx-auto">
-
   <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
     <div class="px-6 py-4 bg-brand text-white text-center">
       <p class="font-semibold">Câmera QR Code</p>
-      <p class="text-blue-200 text-xs mt-0.5">Posicione o QR Code dentro do quadro</p>
+      <p class="text-green-200 text-xs mt-0.5">Posicione o QR Code dentro do quadro</p>
     </div>
 
     <!-- Scanner -->
@@ -22,7 +21,7 @@
     </div>
 
     <!-- Status -->
-    <div id="status-area" class="px-6 pb-5 hidden">
+    <div id="status-area" class="px-6 pb-4 hidden">
       <div id="status-box" class="rounded-xl p-4 text-center"></div>
     </div>
 
@@ -46,13 +45,14 @@
 </div>
 
 <script>
-  let html5QrcodeScanner = null;
+  let scanner = null;
+  let lido = false;
 
-  function onScanSuccess(decodedText, decodedResult) {
-    // Para o scanner
-    if (html5QrcodeScanner) {
-      html5QrcodeScanner.pause();
-    }
+  function onScanSuccess(decodedText) {
+    if (lido) return;
+    lido = true;
+
+    if (scanner) scanner.pause();
 
     const statusArea = document.getElementById('status-area');
     const statusBox = document.getElementById('status-box');
@@ -60,47 +60,78 @@
     statusBox.className = 'rounded-xl p-4 text-center bg-green-50 border border-green-200';
     statusBox.innerHTML = `
       <p class="text-green-700 font-semibold text-sm">✅ QR Code lido!</p>
-      <p class="text-green-600 text-xs mt-1 font-mono">${decodedText}</p>
+      <p class="text-green-600 text-xs mt-1 font-mono break-all">${decodedText}</p>
       <p class="text-green-500 text-xs mt-1">Redirecionando...</p>
     `;
 
-    // Extrai o número do patrimônio da URL ou usa o texto direto
-    let destino = decodedText;
-    if (!decodedText.startsWith('http')) {
-      // Tenta extrair de /verificar/NUMERO/
-      const match = decodedText.match(/\/verificar\/([^\/]+)\//);
+    // Extrai número do patrimônio da URL ou usa texto direto
+    let destino;
+    try {
+      const url = new URL(decodedText);
+      destino = url.pathname;
+    } catch {
+      const match = decodedText.match(/\/verificar\/([^\/]+)\/?/);
       if (match) {
         destino = `/verificar/${match[1]}/`;
       } else {
         destino = `/verificar/${decodedText}/`;
       }
-    } else {
-      // Se for URL absoluta, abre diretamente
-      const url = new URL(decodedText);
-      destino = url.pathname;
     }
 
-    setTimeout(() => { window.location.href = destino; }, 1000);
-  }
-
-  function onScanFailure(error) {
-    // Silencioso — erros de leitura são normais durante o scan
+    setTimeout(() => { window.location.href = destino; }, 800);
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    html5QrcodeScanner = new Html5QrcodeScanner(
-      "qr-reader",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-        showTorchButtonIfSupported: true,
-        showZoomSliderIfSupported: true,
-        defaultZoomValueIfSupported: 2,
-      },
-      false
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    scanner = new Html5Qrcode("qr-reader");
+
+    // Tenta abrir câmera traseira automaticamente
+    Html5Qrcode.getCameras().then(cameras => {
+      if (!cameras || cameras.length === 0) {
+        document.getElementById('qr-reader').innerHTML =
+          '<p class="text-red-400 text-sm text-center p-8">Nenhuma câmera encontrada.</p>';
+        return;
+      }
+
+      // Prefere câmera traseira
+      const camera = cameras.find(c =>
+        c.label.toLowerCase().includes('back') ||
+        c.label.toLowerCase().includes('traseira') ||
+        c.label.toLowerCase().includes('rear')
+      ) || cameras[cameras.length - 1];
+
+      scanner.start(
+        camera.id,
+        {
+          fps: 15,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+        },
+        onScanSuccess,
+        () => { } // ignora erros de frame
+      ).catch(err => {
+        // Fallback: tenta com facingMode
+        scanner.start(
+          { facingMode: "environment" },
+          { fps: 15, qrbox: { width: 250, height: 250 } },
+          onScanSuccess,
+          () => { }
+        ).catch(() => {
+          document.getElementById('qr-reader').innerHTML =
+            '<p class="text-red-400 text-sm text-center p-8">Não foi possível acessar a câmera. Verifique as permissões.</p>';
+        });
+      });
+    }).catch(() => {
+      // Fallback direto com facingMode
+      scanner.start(
+        { facingMode: "environment" },
+        { fps: 15, qrbox: { width: 250, height: 250 } },
+        onScanSuccess,
+        () => { }
+      ).catch(() => {
+        document.getElementById('qr-reader').innerHTML =
+          '<p class="text-red-400 text-sm text-center p-8">Não foi possível acessar a câmera.</p>';
+      });
+    });
   });
 
   function buscarManual() {
@@ -110,7 +141,7 @@
     }
   }
 
-  document.getElementById('manual-numero').addEventListener('keydown', function(e) {
+  document.getElementById('manual-numero').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') buscarManual();
   });
 </script>
