@@ -87,3 +87,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 
 SESSION_COOKIE_NAME = 'inventarius_session'
+LOGOUT_REDIRECT_URL = '/'
+ADMIN_URL = 'admin/'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'inventarius_session'
+SESSION_COOKIE_AGE = 86400
