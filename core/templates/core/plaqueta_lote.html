@@ -396,9 +396,25 @@
         folhasDiv.appendChild(folha);
       }
 
-      window.print();
 
-      // Limpa após impressão
+
+      // Aguarda imagens carregarem antes de imprimir
+      const imgs = folhasDiv.querySelectorAll('img');
+      let loaded = 0;
+      if (imgs.length === 0) {
+        return;
+      }
+      imgs.forEach(img => {
+        if (img.complete) {
+          loaded++;
+          if (loaded === imgs.length) { window.print(); setTimeout(() => { folhasDiv.innerHTML = ''; }, 1000); }
+        } else {
+          img.onload = img.onerror = () => {
+            loaded++;
+            if (loaded === imgs.length) { window.print(); setTimeout(() => { folhasDiv.innerHTML = ''; }, 1000); }
+          };
+        }
+      });
       setTimeout(() => { folhasDiv.innerHTML = ''; }, 1000);
     }
   </script>

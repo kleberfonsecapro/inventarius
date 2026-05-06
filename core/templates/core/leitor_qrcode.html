@@ -51,6 +51,7 @@
   function onScanSuccess(decodedText) {
     if (lido) return;
     lido = true;
+    if (navigator.vibrate) navigator.vibrate(200);
 
     if (scanner) scanner.pause();
 

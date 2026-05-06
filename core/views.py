@@ -6,6 +6,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from .models import Patrimonio, Setor, Servidor, RegistroAuditoria
 from .forms import PatrimonioForm, PesquisaForm, AuditoriaForm, UsuarioForm, LoginForm
+import csv
+from django.http import HttpResponse
+
+
+
 
 
 def is_admin(user):
@@ -218,6 +223,10 @@ def verificar_patrimonio(request, numero):
                     patrimonio.servidor_responsavel = servidor
                 patrimonio.save()
                 messages.success(request, f'Transferência registrada! Novo setor: {setor_destino.nome}')
+            elif acao == 'descarte':
+                patrimonio.descartado = True
+                patrimonio.save()
+                messages.success(request, f'Descarte registrado para {patrimonio.numero_patrimonio}.')
             else:
                 messages.success(request, 'Localização confirmada com sucesso!')
             return redirect('core:verificar_patrimonio', numero=numero)
@@ -235,3 +244,55 @@ def plaqueta_lote(request):
         'patrimonios': patrimonios,
         'setores': setores,
     })
+    
+    from django.http import HttpResponse
+
+@login_required(login_url='/login/')
+def exportar_patrimonios(request):
+    formato = request.GET.get('formato', 'csv')
+    patrimonios = Patrimonio.objects.select_related('setor', 'servidor_responsavel').all()
+
+    if formato == 'csv':
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="patrimonios.csv"'
+        response.write('\ufeff')  # BOM para Excel reconhecer UTF-8
+        writer = csv.writer(response, delimiter=';')
+        writer.writerow(['Nº Patrimônio', 'Nome', 'Descrição', 'Setor', 'Responsável', 'Matrícula', 'Cadastrado em'])
+        for p in patrimonios:
+            writer.writerow([
+                p.numero_patrimonio,
+                p.nome,
+                p.descricao,
+                p.setor.nome if p.setor else '',
+                p.servidor_responsavel.nome if p.servidor_responsavel else '',
+                p.servidor_responsavel.matricula if p.servidor_responsavel else '',
+                p.criado_em.strftime('%d/%m/%Y %H:%M'),
+            ])
+        return response
+
+    # XML
+    from django.utils.xmlutils import SimplerXMLGenerator
+    import io
+    stream = io.StringIO()
+    xml = SimplerXMLGenerator(stream, 'utf-8')
+    xml.startDocument()
+    xml.startElement('patrimonios', {})
+    for p in patrimonios:
+        xml.startElement('patrimonio', {})
+        for tag, val in [
+            ('numero', p.numero_patrimonio),
+            ('nome', p.nome),
+            ('descricao', p.descricao),
+            ('setor', p.setor.nome if p.setor else ''),
+            ('responsavel', p.servidor_responsavel.nome if p.servidor_responsavel else ''),
+            ('matricula', p.servidor_responsavel.matricula if p.servidor_responsavel else ''),
+            ('cadastrado_em', p.criado_em.strftime('%d/%m/%Y %H:%M')),
+        ]:
+            xml.startElement(tag, {})
+            xml.characters(str(val))
+            xml.endElement(tag)
+        xml.endElement('patrimonio')
+    xml.endElement('patrimonios')
+    response = HttpResponse(stream.getvalue(), content_type='application/xml')
+    response['Content-Disposition'] = 'attachment; filename="patrimonios.xml"'
+    return response

@@ -45,6 +45,7 @@ class Patrimonio(models.Model):
     foto = models.ImageField('Foto', upload_to='patrimonios/fotos/', blank=True, null=True)
     numero_patrimonio = models.CharField('Número de Patrimônio', max_length=100, unique=True)
     qrcode_img = models.ImageField('QR Code', upload_to='patrimonios/qrcodes/', blank=True, null=True)
+    descartado = models.BooleanField('Descartado', default=False)
     setor = models.ForeignKey(
         Setor, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='patrimonios', verbose_name='Setor'
@@ -116,6 +117,7 @@ class RegistroAuditoria(models.Model):
     TIPO_CHOICES = [
         ('confirmacao', 'Confirmação de Local'),
         ('transferencia', 'Transferência'),
+        ('descarte', 'Descarte'),
     ]
     patrimonio = models.ForeignKey(
         Patrimonio, on_delete=models.CASCADE,

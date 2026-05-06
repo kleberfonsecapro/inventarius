@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,55 +8,63 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: { extend: { colors: { brand: { DEFAULT: '#1e3a5f', light: '#2d5282', accent: '#e8a020' } }, fontFamily: { sans: ['Sora', 'sans-serif'] } } }
+      theme: { extend: { colors: { brand: { DEFAULT: '#1a6b3a', light: '#1f7d45' } }, fontFamily: { sans: ['Sora', 'sans-serif'] } } }
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     .form-input {
-      width: 100%; border: 1px solid #e2e8f0; border-radius: 0.5rem;
-      padding: 0.65rem 0.85rem; font-size: 0.9rem; color: #334155;
-      background: #f8fafc; outline: none; transition: border-color 0.15s; font-family: 'Sora', sans-serif;
+      width: 100%;
+      border: 1px solid #bbf7d0;
+      border-radius: 0.5rem;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.9rem;
+      color: #334155;
+      background: #f0fdf4;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: 'Sora', sans-serif;
     }
-    .form-input:focus { border-color: #1e3a5f; background: white; }
+
+    .form-input:focus {
+      border-color: #1a6b3a;
+      background: white;
+    }
   </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+
+<body class="min-h-screen font-sans flex items-center justify-center p-4"
+  style="background: linear-gradient(135deg, #1a6b3a 0%, #1f7d45 50%, #166534 100%);">
 
   <div class="w-full max-w-sm">
-    <!-- Logo -->
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-brand rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      </div>
-      <h1 class="text-2xl font-bold text-slate-800">Inventarius</h1>
-      <p class="text-slate-500 text-sm mt-1">Gestão de Patrimônio</p>
+    <!-- Logo num card branco para as letras aparecerem -->
+    <div class="bg-white rounded-2xl shadow-xl px-2 py-1 mb-5 text-center">
+      <img
+        src="data:image/png;base64,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"
+        alt="Logo Prefeitura" class="h-44 w-auto mx-auto" />
     </div>
 
-    <!-- Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-      <h2 class="text-lg font-semibold text-slate-800 mb-6">Entrar no sistema</h2>
+    <!-- Card do formulário -->
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <h2 class="text-base font-semibold text-slate-700 mb-5 text-center">Acesso ao Sistema</h2>
 
       {% if form.non_field_errors %}
-        <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5">
-          {% for err in form.non_field_errors %}
-            <p class="text-red-700 text-sm">{{ err }}</p>
-          {% endfor %}
-        </div>
+      <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+        {% for err in form.non_field_errors %}
+        <p class="text-red-700 text-sm">{{ err }}</p>
+        {% endfor %}
+      </div>
       {% endif %}
 
       <form method="post" class="space-y-4">
         {% csrf_token %}
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.username.label }}</label>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">{{ form.username.label }}</label>
           {{ form.username }}
           {% for err in form.username.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">{{ form.password.label }}</label>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">{{ form.password.label }}</label>
           {{ form.password }}
           {% for err in form.password.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
         </div>
@@ -65,7 +74,11 @@
         </button>
       </form>
     </div>
+
+    <p class="text-center text-green-200 text-xs mt-5">Prefeitura Municipal de Cuiabá — Secretaria Municipal de Educação
+    </p>
   </div>
 
 </body>
+
 </html>

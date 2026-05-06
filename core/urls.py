@@ -24,4 +24,5 @@ urlpatterns = [
     path('plaquetas/lote/', views.plaqueta_lote, name='plaqueta_lote'),
     path('leitor/', views.leitor_qrcode, name='leitor_qrcode'),
     path('verificar/<str:numero>/', views.verificar_patrimonio, name='verificar_patrimonio'),
+    path('patrimonios/exportar/', views.exportar_patrimonios, name='exportar_patrimonios'),
 ]

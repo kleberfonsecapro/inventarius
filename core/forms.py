@@ -85,6 +85,7 @@ class AuditoriaForm(forms.Form):
     ACAO_CHOICES = [
         ('confirmacao', '✅ Confirmar — item está no local correto'),
         ('transferencia', '🔀 Transferir — registrar novo local'),
+        ('descarte', '🗑️ Descarte — item sem condições de uso'),
     ]
     acao = forms.ChoiceField(choices=ACAO_CHOICES, widget=forms.RadioSelect)
     setor_destino = forms.ModelChoiceField(
